@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 
-export default function App() {
+export default function AvailabilityCalendar() {
   const [availability, setAvailability] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedRoute, setSelectedRoute] = useState("7");
@@ -43,6 +43,7 @@ export default function App() {
       const data = await response.json();
       setAvailability(data.data);
       
+      // Extraer horarios disponibles
       const schedules = Object.keys(data.data || {});
       setAvailableSchedules(["all", ...schedules]);
     } catch (error) {
@@ -57,6 +58,47 @@ export default function App() {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h1 className="text-2xl font-bold mb-4">Disponibilidad Machu Picchu</h1>
+      <div className="mb-4 flex gap-4 items-center">
+        <label className="font-semibold">Routes:</label>
+        <select
+          className="p-2 border rounded"
+          value={selectedRoute}
+          onChange={(e) => setSelectedRoute(e.target.value)}
+        >
+          {routes.map((route) => (
+            <option key={route.id} value={route.id}>{route.name}</option>
+          ))}
+        </select>
+        <label className="font-semibold">Month:</label>
+        <select
+          className="p-2 border rounded"
+          value={month}
+          onChange={(e) => setMonth(e.target.value)}
+        >
+          {months.map((m, index) => (
+            <option key={index + 1} value={index + 1}>{m}</option>
+          ))}
+        </select>
+        <label className="font-semibold">Year:</label>
+        <input
+          type="number"
+          className="p-2 border rounded w-20"
+          value={year}
+          onChange={(e) => setYear(e.target.value)}
+        />
+        <label className="font-semibold">Schedules:</label>
+        <select
+          className="p-2 border rounded"
+          value={selectedSchedule}
+          onChange={(e) => setSelectedSchedule(e.target.value)}
+        >
+          {availableSchedules.map((schedule) => (
+            <option key={schedule} value={schedule}>{schedule === "all" ? "All schedules" : schedule}</option>
+          ))}
+        </select>
+      </div>
+
+      {loading && <p>Cargando...</p>}
       <h2 className="text-xl font-semibold mb-2">{months[month - 1]} {year}</h2>
       <div className="grid grid-cols-7 gap-2 bg-white p-4 rounded-lg shadow">
         {["D", "L", "M", "Mi", "J", "V", "S"].map((day, index) => (
@@ -82,8 +124,8 @@ export default function App() {
           return (
             <div
               key={day}
-              className={`h-24 flex flex-col items-center justify-center border rounded p-2 ${
-                availableTickets > 10 ? "bg-green-300" : availableTickets > 0 ? "bg-yellow-300" : "bg-red-300"
+              className={`h-20 flex flex-col items-center justify-center border rounded p-2 ${
+                availableTickets > 0 ? "bg-green-200" : "bg-gray-200"
               }`}
             >
               <span className="font-bold">{day}</span>
